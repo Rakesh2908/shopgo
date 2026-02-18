@@ -1,0 +1,69 @@
+# ShopGo — Cursor AI Rules
+## Project Overview
+Full-stack e-commerce app. Backend: Go 1.22 with Gin. Frontend: React 18 +
+TypeScript + Vite + Tailwind.
+Database: PostgreSQL via GORM. Auth: JWT (access token in memory, refresh in
+httpOnly cookie).
+Payments: Stripe test mode. Products: FakeStoreAPI (fakestoreapi.com, free, no
+key needed).
+## Go Rules (STRICTLY FOLLOW)
+- Use standard Go project layout: cmd/server/main.go,
+internal/<domain>/{handler,service,repository}.go, pkg/<util>/
+- Every exported function must have a godoc comment
+- Use interfaces for all service and repository layers (enables testing)
+- Error handling: always check errors, never use _ for errors in critical
+paths
+- Use go-playground/validator for all request body validation
+- Use GORM for all DB queries — no raw SQL with user input (prevents SQL
+injection)
+- HTTP handlers must only do: parse input, call service, return response
+- Business logic lives ONLY in service layer
+- DB queries live ONLY in repository layer
+- Use pkg/response package for all JSON responses (consistent envelope)
+- Config via environment variables using kelseyhightower/envconfig
+- All context parameters must be passed through from handler to service to
+repo
+- Run gofmt on all Go files
+## React Rules (STRICTLY FOLLOW)
+- Functional components ONLY — no class components ever
+- TypeScript strict mode — no 'any' types
+- All API calls via src/api/ layer — never fetch() directly in components
+- Global state: Zustand only (no Redux, no Context for global state)
+- Server state: TanStack React Query (useQuery, useMutation) for all API data
+- Forms: react-hook-form + zod for validation
+- Styling: Tailwind CSS utility classes only — no inline styles, no CSS
+modules
+- Icons: lucide-react only
+- Toast notifications: react-hot-toast only
+- File naming: PascalCase for components, camelCase for hooks/utils/api
+- Each component in its own file
+- Always handle loading and error states for async operations
+- Lazy load routes with React.lazy() + Suspense
+## Design Rules
+- Color palette: primary=#0F172A (navy), accent=#2563EB (blue), bg=#F8FAFC,
+surface=#FFFFFF
+- Font: Inter from Google Fonts
+- Tailwind config: extend with above colors as 'primary', 'accent'
+- Clean, minimal, lots of whitespace — no cramped layouts
+- Skeleton loaders for product grids (not spinners)
+- Responsive: mobile-first, 1-col → 2-col tablet → 3-4-col desktop
+- Product cards: white, shadow-sm, rounded-xl, hover:shadow-md transition
+## Security Rules
+- JWT access tokens stored in Zustand memory only — NEVER localStorage
+- Refresh tokens in httpOnly SameSite=Strict cookie only
+- BCrypt cost factor 12 for passwords
+- Rate limit auth endpoints: 10 req/min per IP
+- All CORS origins must be explicit — no wildcard in production
+- Stripe: use Stripe.js Elements — card numbers never touch our server
+- Webhook: always verify Stripe-Signature header
+## File Structure — DO NOT deviate
+backend/ → Go project (cmd/, internal/, pkg/, migrations/)
+frontend/ → React project (src/api/, src/components/, src/pages/, src/store/,
+src/hooks/, src/types/)
+## When generating code, always:
+1. Add all necessary imports
+2. Export what needs to be exported
+3. Use the exact folder structure defined above
+4. Include TypeScript types for all props and function signatures
+5. Add error handling — never leave async operations without .catch or
+try/catch
