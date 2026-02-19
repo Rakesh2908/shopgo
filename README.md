@@ -110,6 +110,30 @@ Open **http://localhost:5173**. The app will call the backend at `VITE_API_URL` 
 - Card numbers never hit your server; use [Stripe.js / Elements](https://stripe.com/docs/stripe-js) (as in this app).  
 - For local webhook testing, use [Stripe CLI](https://stripe.com/docs/stripe-cli) and set `STRIPE_WEBHOOK_SECRET` in `backend/.env`.
 
+#### Stripe CLI & webhooks (local)
+
+```bash
+brew install stripe/stripe-cli/stripe
+stripe login
+```
+
+In a **separate terminal tab** (while the backend is running):
+
+```bash
+stripe listen --forward-to localhost:8080/api/v1/webhooks/stripe
+```
+
+Copy the webhook signing secret it prints (`whsec_...`), paste it into `backend/.env` as `STRIPE_WEBHOOK_SECRET`, then restart the backend.
+
+#### Test Stripe payment (checkout)
+
+Use these test card numbers at checkout:
+
+| Use case     | Card number           | Expiry     | CVC  | ZIP   |
+| ------------ | --------------------- | ---------- | ---- | ----- |
+| Success      | `4242 4242 4242 4242` | Any future (e.g. 12/29) | Any 3 digits (e.g. 123) | Any (e.g. 12345) |
+| 3D Secure    | `4000 0027 6000 3184` | Any future | Any 3 digits | Any   |
+
 ## Environment Variables
 
 ### Backend (`backend/.env`)

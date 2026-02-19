@@ -6,7 +6,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { createPaymentIntent } from '@/api/orders'
@@ -18,6 +18,7 @@ import useAuthStore from '@/store/authStore'
 
 function CheckoutForm() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -35,6 +36,10 @@ function CheckoutForm() {
       toast.error(error.message ?? 'Payment failed')
       return
     }
+
+    // Payment confirmed; refresh cart and orders so UI reflects new state.
+    queryClient.invalidateQueries({ queryKey: ['cart'] })
+    queryClient.invalidateQueries({ queryKey: ['orders'] })
 
     navigate('/orders', { replace: true })
   }

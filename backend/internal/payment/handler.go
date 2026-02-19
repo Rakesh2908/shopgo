@@ -2,6 +2,7 @@ package payment
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -77,6 +78,7 @@ func handleStripeWebhook(svc PaymentService) gin.HandlerFunc {
 			return
 		}
 		if err := svc.HandleWebhook(payload, sigHeader); err != nil {
+			log.Printf("stripe webhook error: %v", err)
 			// Stripe expects non-2xx to retry; keep message generic.
 			response.Error(c, http.StatusBadRequest, "WEBHOOK_ERROR", "invalid webhook")
 			return

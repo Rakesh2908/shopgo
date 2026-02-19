@@ -67,7 +67,9 @@ func (s *paymentService) HandleWebhook(payload []byte, sigHeader string) error {
 	if s.webhookSecret == "" {
 		return errors.New("payment: missing webhook secret")
 	}
-	event, err := webhook.ConstructEvent(payload, sigHeader, s.webhookSecret)
+	event, err := webhook.ConstructEventWithOptions(payload, sigHeader, s.webhookSecret, webhook.ConstructEventOptions{
+		IgnoreAPIVersionMismatch: true,
+	})
 	if err != nil {
 		return fmt.Errorf("payment: invalid webhook signature: %w", err)
 	}
